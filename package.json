@@ -16,8 +16,8 @@
     "pretty:fix": "prettier --write .",
     "pretty:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "compile": "esbuild src/index.ts --platform=node --target=es2020,node16 --bundle --format=esm --outdir=dist --sourcemap --minify",
-    "compile:ci": "esbuild src/index.ts --platform=node --target=es2020,node16 --bundle --format=esm --outdir=ci-dist --sourcemap --minify"
+    "compile": "esbuild src/index.ts --platform=node --target=node16 --bundle --format=cjs --outdir=dist --sourcemap --minify",
+    "compile:ci": "esbuild src/index.ts --platform=node --target=node16 --bundle --format=cjs --outdir=ci-dist --sourcemap --minify"
   },
   "repository": {
     "type": "git",
