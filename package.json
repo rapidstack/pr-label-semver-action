@@ -6,6 +6,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "ci-cd": "npm ci --quiet --no-fund",
+    "prime": "npm i --quiet --no-fund",
     "test": "vitest --run",
     "build": "npm run typecheck && npm run pretty:check && npm run lint:check && npm run compile",
     "lint:fix": "eslint . --ext .ts --fix",
