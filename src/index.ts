@@ -1,7 +1,7 @@
 import { sayHello } from './hello.js';
 
 const main = async () => {
-  sayHello();
+  console.log(sayHello());
 };
 
 await main();

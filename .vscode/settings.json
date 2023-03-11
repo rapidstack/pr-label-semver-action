@@ -1,13 +1,5 @@
 {
-  "cSpell.words": [
-    "autobuild",
-    "codeql",
-    "nodenext",
-    "rapidstack",
-    "tsup",
-    "Zack",
-    "zackheil"
-  ],
+  "cSpell.words": ["autobuild", "codeql", "nodenext", "rapidstack", "tsup", "typecheck", "vitest", "Zack", "zackheil"],
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true

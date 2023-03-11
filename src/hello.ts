@@ -1,1 +1,1 @@
-export const sayHello = () => console.log('Hello, world!');
+export const sayHello = () => 'Hello, world!';

@@ -1,0 +1,36 @@
+name: PR Checks
+on:
+  pull_request:
+    types: [assigned, labeled, unlabeled, opened, synchronize, reopened]
+    paths: ["**.ts", "**.js", "**/package*.json", "**/workflows/on-merge-main.yml", "**/workflows/active-pr-checks.yml"]
+
+# Allow a subsequently queued workflow run to interrupt a previous run
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+    if: ${{ !github.event.issue.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Project
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm run prime
+
+      - name: Ensure Project Builds
+        run: npm run build
+
+      - name: Run Tests
+        run: npm run test
