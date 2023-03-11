@@ -4,7 +4,7 @@
   "description": "Logic for PR Label Semver Action",
   "main": "dist/index.js",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "ci-cd": "npm ci --quiet --no-fund",
     "prime": "npm i --quiet --no-fund",
