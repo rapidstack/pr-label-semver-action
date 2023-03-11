@@ -1,5 +1,4 @@
 import * as core from '@actions/core';
-import { sayHello } from './hello.js';
 
 const main = async () => {
   try {
@@ -14,8 +13,6 @@ const main = async () => {
     // Resolve the version number based on the labels and the most recent tag
 
     // Return the resolved version number as an output variable
-
-    console.log(sayHello());
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
@@ -25,4 +22,4 @@ const main = async () => {
   }
 };
 
-await main();
+main();

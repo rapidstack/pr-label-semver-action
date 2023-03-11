@@ -8,7 +8,7 @@
   "scripts": {
     "ci-cd": "npm ci --quiet --no-fund",
     "prime": "npm i --quiet --no-fund",
-    "test": "vitest --run",
+    "test": "vitest",
     "build": "npm run typecheck && npm run pretty:check && npm run lint:check && npm run compile",
     "build:ci": "npm run typecheck && npm run pretty:check && npm run lint:check && npm run compile:ci",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -16,8 +16,8 @@
     "pretty:fix": "prettier --write .",
     "pretty:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "compile": "tsup src/index.ts --format esm --out-dir dist --sourcemap --minify",
-    "compile:ci": "tsup src/index.ts --format esm --out-dir ci-dist --sourcemap --minify"
+    "compile": "esbuild src/index.ts --platform=node --target=es2020,node16 --bundle --format=esm --outdir=dist --sourcemap --minify",
+    "compile:ci": "esbuild src/index.ts --platform=node --target=es2020,node16 --bundle --format=esm --outdir=ci-dist --sourcemap --minify"
   },
   "repository": {
     "type": "git",
@@ -39,15 +39,16 @@
     "@types/node": "^18.15.0",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
+    "esbuild": "^0.17.11",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.4",
-    "tsup": "^6.6.3",
     "typescript": "^4.9.5",
     "vitest": "^0.29.2"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "octokit": "^2.0.14"
   }
 }
