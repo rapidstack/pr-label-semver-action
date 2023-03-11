@@ -36,10 +36,11 @@ jobs:
         run: npm run test
 
       - name: Ensure Fresh Build
+        id: diff
         run: diff dist/index.js ci-dist/index.js -s
 
       - name: Conditionally Alert Diff
-        if: failure() && steps.test.conclusion == 'failure'
+        if: ${{ failure() && steps.diff.conclusion == 'failure' }}
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
