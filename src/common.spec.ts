@@ -20,7 +20,7 @@ describe('Utility Functions', () => {
 
     SemverFailTestCases.forEach((testCase) => {
       test('fail cases', () => {
-        expect(parseSemver(testCase)).toThrow();
+        expect(() => parseSemver(testCase)).toThrow();
       });
     });
   });
