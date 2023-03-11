@@ -1,15 +1,3 @@
-import * as core from '@actions/core';
-
-export const getActionInput = (name: string, def: string) => {
-  const input = core.getInput(name, { trimWhitespace: true });
-  if (input) {
-    core.debug(`Using user-passed input for variable ${name}. (${input})`);
-    return input;
-  }
-  core.debug(`Using default value for variable ${name}. (${input})`);
-  return def;
-};
-
 /**
  * Will parse a semver in following formats:
  * v1.2.3
