@@ -35,11 +35,11 @@ jobs:
       - name: Run Tests
         run: npm run test
 
-      - name: Ensure Fresh Build
+      - name: Ensure Build is Fresh
         id: diff
         run: diff dist/index.js ci-dist/index.js -s
 
-      - name: Conditionally Alert Diff
+      - name: Conditionally Alert on Diff
         if: ${{ failure() && steps.diff.conclusion == 'failure' }}
         uses: thollander/actions-comment-pull-request@v2
         with:
