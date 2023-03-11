@@ -10,12 +10,14 @@
     "prime": "npm i --quiet --no-fund",
     "test": "vitest --run",
     "build": "npm run typecheck && npm run pretty:check && npm run lint:check && npm run compile",
+    "build:ci": "npm run typecheck && npm run pretty:check && npm run lint:check && npm run compile:ci",
     "lint:fix": "eslint . --ext .ts --fix",
     "lint:check": "eslint . --ext .ts",
     "pretty:fix": "prettier --write .",
     "pretty:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "compile": "tsup src/index.ts --format esm --out-dir dist --sourcemap --minify"
+    "compile": "tsup src/index.ts --format esm --out-dir dist --sourcemap --minify",
+    "compile:ci": "tsup src/index.ts --format esm --out-dir ci-dist --sourcemap --minify"
   },
   "repository": {
     "type": "git",

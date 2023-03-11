@@ -30,7 +30,10 @@ jobs:
         run: npm run ci-cd
 
       - name: Ensure Project Builds
-        run: npm run build
+        run: npm run build:ci
 
       - name: Run Tests
         run: npm run test
+
+      - name: Ensure Fresh Build
+        run: diff dist/index.js ci-dist/index.js -s
