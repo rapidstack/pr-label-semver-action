@@ -19,7 +19,7 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
   const octokit = ext.getOctokit(ext.getToken());
   const context = ext.getContext();
 
-  const defaultBranchName = context.payload.base.ref as string;
+  const defaultBranchName = context.payload.repository?.default_branch as string;
   ext.logDebug('Default branch for repo: ' + defaultBranchName);
 
   const commits = await octokit.rest.repos.listCommits({
