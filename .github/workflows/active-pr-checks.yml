@@ -37,3 +37,10 @@ jobs:
 
       - name: Ensure Fresh Build
         run: diff dist/index.js ci-dist/index.js -s
+
+      - name: Conditionally Alert Diff
+        if: steps.test.conclusion == 'failure'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.

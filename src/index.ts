@@ -13,6 +13,8 @@ const main = async () => {
     // Resolve the version number based on the labels and the most recent tag
 
     // Return the resolved version number as an output variable
+
+    console.log('Hello World');
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
