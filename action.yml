@@ -1,0 +1,11 @@
+name: "PR Label Semver Action"
+description: "Generates a semver change by looking at set labels on a PR."
+author: "rapidstack"
+# inputs:
+#   varName: # change this
+#     required: true
+#     description: "description"
+#     default: "default value"
+runs:
+  using: "node18"
+  main: "dist/index.js"

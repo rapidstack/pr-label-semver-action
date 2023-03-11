@@ -1,0 +1,35 @@
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    target-branch: "dependabot-staging"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "15:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 100
+    commit-message:
+      prefix: "(Action Update):"
+    reviewers:
+      - "zackheil"
+    assignees:
+      - "zackheil"
+
+  - package-ecosystem: "npm"
+    target-branch: "dependabot-staging"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "15:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 100
+    commit-message:
+      prefix: "(Dep Update):"
+      prefix-development: "(Dev Dep Update):"
+    reviewers:
+      - "zackheil"
+    assignees:
+      - "zackheil"

@@ -1,0 +1,25 @@
+{
+  "cSpell.words": [
+    "autobuild",
+    "codeql",
+    "nodenext",
+    "rapidstack",
+    "tsup",
+    "Zack",
+    "zackheil"
+  ],
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  }
+}
