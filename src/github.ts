@@ -49,3 +49,50 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
 
   return latestTag ? tagMap[latestTag] : undefined;
 };
+
+export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major' | 'minor' | 'patch') => {
+  ext.logDebug('Getting labels from the active pull request.');
+
+  const context = ext.getContext();
+  const labels = context.payload.pull_request?.labels.map(({ name }: { name: string }) => name.toLowerCase());
+  ext.logDebug('Labels on the active pull request: ' + JSON.stringify(labels, null, 2));
+
+  const applicableLabels = labels?.filter((label: string) => {
+    if (
+      label === `${prefix}major` ||
+      label === `${prefix}minor` ||
+      label === `${prefix}patch` ||
+      label === `${prefix}generate_prerelease`
+    ) {
+      return true;
+    }
+    return false;
+  });
+  ext.logDebug('Applicable labels on the active pull request: ' + JSON.stringify(applicableLabels, null, 2));
+
+  // Extract the 'generate_prerelease' label if it exists
+  const generatePrerelease = applicableLabels?.includes(`${prefix}generate_prerelease`);
+  const remainingLabels = applicableLabels?.filter((label: string) => label !== `${prefix}generate_prerelease`);
+
+  if (remainingLabels?.length > 1) {
+    throw new Error(
+      `Multiple applicable labels found on the active pull request. Please only use one of the following labels: ${prefix}major, ${prefix}minor, ${prefix}patch`
+    );
+  }
+
+  if (remainingLabels?.length === 0) {
+    ext.logDebug(
+      'No applicable labels found on the active pull request or not operating in a pull request. Using default bump: ' +
+        def
+    );
+    return {
+      action: def,
+      prerelease: false,
+    };
+  }
+
+  return {
+    action: remainingLabels?.[0].replace(`${prefix}`, '') as 'major' | 'minor' | 'patch',
+    prerelease: generatePrerelease ? true : false,
+  };
+};
