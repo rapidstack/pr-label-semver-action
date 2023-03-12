@@ -5,6 +5,7 @@
     "esbuild",
     "nodenext",
     "outdir",
+    "prereleases",
     "rapidstack",
     "thollander",
     "typecheck",

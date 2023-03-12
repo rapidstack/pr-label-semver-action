@@ -4,7 +4,7 @@ import * as github from '@actions/github';
 /**
  * This is just here to make mocking external calls easier
  */
-export const ext = {
+export const external = {
   logDebug: core.debug,
   setFailed: core.setFailed,
   getInput: core.getInput,
@@ -13,5 +13,3 @@ export const ext = {
   getContext: () => github.context,
   setOutput: core.setOutput,
 };
-
-export type External = typeof ext;

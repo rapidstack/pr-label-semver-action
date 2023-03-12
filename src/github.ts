@@ -1,4 +1,4 @@
-import type { External } from './external.js';
+import type { Semver, External } from './types.js';
 
 /**
  * Gets the value of an action input variable, or defaults to a value. Embeds debug logging.
@@ -13,6 +13,10 @@ export const getActionInput = (ext: External, name: string, def: string) => {
   return def;
 };
 
+/**
+ * Determines the default branch of the repo, looks for commits on that branch,
+ * and gets the latest tag on that branch.
+ */
 export const getLatestDefaultBranchTag = async (ext: External) => {
   ext.logDebug('Searching last 100 commits from the default branch for a tag.');
 
@@ -50,12 +54,19 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
   return latestTag ? tagMap[latestTag] : undefined;
 };
 
+/**
+ * Gets the labels from the PR, looks for those appropriate for the action, and returns the appropriate semver bump.
+ * If no label is found, returns an action following the default bump.
+ */
 export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major' | 'minor' | 'patch') => {
   ext.logDebug('Getting labels from the active pull request.');
 
   const context = ext.getContext();
+  const merged = context.payload.pull_request?.merged || false;
   const labels = context.payload.pull_request?.labels.map(({ name }: { name: string }) => name.toLowerCase());
+
   ext.logDebug('Labels on the active pull request: ' + JSON.stringify(labels, null, 2));
+  if (merged) ext.logDebug('Pull request is merged, will not generate a prerelease version.');
 
   const applicableLabels = labels?.filter((label: string) => {
     if (
@@ -71,7 +82,7 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
   ext.logDebug('Applicable labels on the active pull request: ' + JSON.stringify(applicableLabels, null, 2));
 
   // Extract the 'generate_prerelease' label if it exists
-  const generatePrerelease = applicableLabels?.includes(`${prefix}generate_prerelease`);
+  const generatePrerelease = merged ? false : applicableLabels?.includes(`${prefix}generate_prerelease`);
   const remainingLabels = applicableLabels?.filter((label: string) => label !== `${prefix}generate_prerelease`);
 
   if (remainingLabels?.length > 1) {
@@ -92,7 +103,7 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
   }
 
   return {
-    action: remainingLabels?.[0].replace(`${prefix}`, '') as 'major' | 'minor' | 'patch',
+    action: remainingLabels?.[0].replace(`${prefix}`, '') as Semver,
     prerelease: generatePrerelease ? true : false,
   };
 };

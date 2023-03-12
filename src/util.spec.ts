@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { createSemver, parseSemver } from './util.js';
+import type { Semver } from './types.js';
 
 const SemverParseSuccessTestCases = {
   'v1.2.3': { major: 1, minor: 2, patch: 3, suffix: undefined },
@@ -9,7 +10,7 @@ const SemverParseSuccessTestCases = {
 };
 
 const SemverParseFailTestCases = [, '', '1.2', '1.2.3.4', '1.2.3suffix'] as string[];
-type CreateSemverT = [string, 'major' | 'minor' | 'patch', string | undefined];
+type CreateSemverT = [string, Semver, string | undefined];
 
 const SemverCreateTestCases = [
   { input: ['v1.2.3', 'major'], expected: { string: '2.0.0', major: 2, minor: 0, patch: 0, suffix: undefined } },

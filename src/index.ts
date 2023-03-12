@@ -1,18 +1,17 @@
 import { getActionFromPRLabels, getActionInput, getLatestDefaultBranchTag } from './github.js';
-import { ext } from './external.js';
+import { external } from './external.js';
 import { createSemver } from './util.js';
+import type { External, MockInput, Semver } from './types.js';
 
-const main = async () => {
+export const main = async (ext: External, mockInput?: MockInput) => {
   try {
     ext.logDebug('Starting Action');
 
     // Get the input variables from the action
     const context = ext.getContext();
-    const defaultBump = getActionInput(ext, 'default-bump', 'patch') as 'major' | 'minor' | 'patch';
-    const prereleasePrefix = getActionInput(ext, 'prerelease-prefix', 'rc.');
-    const labelPrefix = getActionInput(ext, 'label-prefix', '');
-
-    console.log('context', JSON.stringify(context, null, 2));
+    const defaultBump = mockInput?.defaultBump ?? (getActionInput(ext, 'default-bump', 'patch') as Semver);
+    const prereleasePrefix = mockInput?.prereleasePrefix ?? getActionInput(ext, 'prerelease-prefix', 'rc.');
+    const labelPrefix = mockInput?.labelPrefix ?? getActionInput(ext, 'label-prefix', '');
 
     // Get the most recent tag associated with the commit on the main branch
     const latestTag = await getLatestDefaultBranchTag(ext);
@@ -20,14 +19,15 @@ const main = async () => {
 
     // Resolve the version number based on the labels and the most recent tag
     const { action, prerelease } = getActionFromPRLabels(ext, labelPrefix, defaultBump);
-
     const shortSha = context.payload.pull_request?.head.sha.slice(0, 7);
     const prereleaseString = prerelease ? `${prereleasePrefix}${shortSha}` : undefined;
     const newSemver = createSemver(latestTag, action, prereleaseString);
 
     // Return the resolved version number as an output variable
     ext.logDebug(`Resolved new version number: ${newSemver.string}`);
-    Object.entries(newSemver).forEach(([key, value]) => {
+
+    Object.entries({ ...newSemver, prerelease }).forEach(([key, value]) => {
+      ext.logDebug(`Setting output variable ${key} to ${value}`);
       ext.setOutput(key, value);
     });
   } catch (error) {
@@ -39,4 +39,4 @@ const main = async () => {
   }
 };
 
-main();
+!process.env.VITEST && main(external);

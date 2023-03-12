@@ -1,6 +1,9 @@
 name: "PR Label Semver Action"
 description: "Generates a semver change by looking at set labels on a PR."
 author: "rapidstack"
+branding:
+  icon: "tag"
+  color: "green"
 inputs:
   default-bump:
     required: false

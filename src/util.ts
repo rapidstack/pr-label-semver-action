@@ -1,3 +1,5 @@
+import type { Semver } from './types.js';
+
 /**
  * Will parse a semver in following formats:
  * v1.2.3
@@ -29,7 +31,7 @@ export const parseSemver = (semver: string) => {
 /**
  * Will create a semver based upon current state, bump type, and optional prerelease suffix
  */
-export const createSemver = (current: string, bump: 'major' | 'minor' | 'patch', prerelease?: string) => {
+export const createSemver = (current: string, bump: Semver, prerelease?: string) => {
   let { major, minor, patch } = parseSemver(current);
 
   switch (bump) {
