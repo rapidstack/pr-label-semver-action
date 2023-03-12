@@ -45,6 +45,8 @@ export const createSemver = (current: string, bump: 'major' | 'minor' | 'patch',
     case 'patch':
       patch += 1;
       break;
+    default:
+      throw new Error(`Invalid semver bump type: ${bump}. Must be one of: major, minor, or patch.`);
   }
 
   return {

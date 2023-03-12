@@ -11,6 +11,7 @@ export const ext = {
   getToken: () => core.getInput('github-token'),
   getOctokit: github.getOctokit,
   getContext: () => github.context,
+  setOutput: core.setOutput,
 };
 
 export type External = typeof ext;

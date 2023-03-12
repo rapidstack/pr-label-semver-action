@@ -21,13 +21,15 @@ const main = async () => {
     // Resolve the version number based on the labels and the most recent tag
     const { action, prerelease } = getActionFromPRLabels(ext, labelPrefix, defaultBump);
 
-    // Return the resolved version number as an output variable
     const shortSha = context.payload.pull_request?.head.sha.slice(0, 7);
-    const prereleaseString = prerelease ? `${prereleasePrefix}.${shortSha}` : '';
+    const prereleaseString = prerelease ? `${prereleasePrefix}${shortSha}` : undefined;
     const newSemver = createSemver(latestTag, action, prereleaseString);
 
+    // Return the resolved version number as an output variable
     ext.logDebug(`Resolved new version number: ${newSemver.string}`);
-    console.log({ newSemver });
+    Object.entries(newSemver).forEach(([key, value]) => {
+      ext.setOutput(key, value);
+    });
   } catch (error) {
     if (error instanceof Error) {
       ext.setFailed(error.message);
