@@ -1,0 +1,23 @@
+name: "PR Label Semver Action"
+description: "Generates a semver change by looking at set labels on a PR."
+author: "rapidstack"
+branding:
+  icon: "tag"
+  color: "green"
+inputs:
+  default-bump:
+    required: false
+    description: "For non pull requests (i.e.: workflow_dispatch), the default bump to apply to the version."
+  prerelease-prefix:
+    required: false
+    description: "The string to append at the end of a semver for a prerelease version. E.g.: if you set this to 'rc.', the version will be 'x.y.z-rc.{short-hash}'."
+  label-prefix:
+    required: false
+    description: "Prefix on PR labels that the action will act on to determine the semver bump. E.g.: value of 'sv:' will look for labels like 'SV:MAJOR', 'sv:minor', etc."
+  github-token:
+    required: false
+    description: "GitHub token to use for operations."
+    default: ${{ github.token }}
+runs:
+  using: "node16"
+  main: "dist/index.js"

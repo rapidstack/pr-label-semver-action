@@ -1,0 +1,33 @@
+name: Weekly Dependency Update Branch
+on:
+  schedule:
+    - cron: "0 6 * * 6" # (friday at midnight CST)
+  workflow_dispatch:
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Create Branch
+        run: |
+          git config --global user.name "Zack Heil"
+          git config --global user.email "57419337+zackheil@users.noreply.github.com"
+          git checkout -b dependabot-staging
+          git commit --allow-empty -m "Create dependabot-staging branch"
+          git push origin dependabot-staging
+      - name: Create Draft PR for Updates
+        uses: devops-infra/action-pull-request@v0.5.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: dependabot-staging
+          target_branch: main
+          title: "Weekly Dependency Updates"
+          body: "Bulk dependency updates for the week."
+          reviewer: "zackheil"
+          assignee: "zackheil"
+          draft: true
+          ignore_users: "dependabot"
+          allow_no_diff: true
