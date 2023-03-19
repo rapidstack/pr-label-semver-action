@@ -1,6 +1,6 @@
 import { getActionFromPRLabels, getActionInput, getLatestDefaultBranchTag } from './github.js';
 import { external } from './external.js';
-import { createSemver } from './util.js';
+import { createSemver, parseSemver } from './util.js';
 import type { External, MockInput, Semver } from './types.js';
 
 export const main = async (ext: External, mockInput?: MockInput) => {
@@ -23,10 +23,17 @@ export const main = async (ext: External, mockInput?: MockInput) => {
     const prereleaseString = prerelease ? `${prereleasePrefix}${shortSha}` : undefined;
     const newSemver = createSemver(latestTag, action, prereleaseString);
 
-    // Return the resolved version number as an output variable
+    // Return the resolved version number and other contextual info as output variables
     ext.logDebug(`Resolved new version number: ${newSemver.string}`);
 
-    Object.entries({ ...newSemver, prerelease }).forEach(([key, value]) => {
+    const { major: lastMaj, minor: lastMin, patch: lastPatch, suffix } = parseSemver(latestTag);
+    const output = {
+      ...newSemver,
+      prerelease,
+      lastMainTag: `${lastMaj}.${lastMin}.${lastPatch}${suffix ? `-${suffix}` : ''}`,
+    };
+
+    Object.entries(output).forEach(([key, value]) => {
       ext.logDebug(`Setting output variable ${key} to ${value}`);
       ext.setOutput(key, value);
     });

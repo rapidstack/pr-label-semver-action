@@ -1,0 +1,113 @@
+name: PR Checks and Publish on Merge
+on:
+  pull_request:
+    types: [assigned, labeled, unlabeled, opened, synchronize, reopened, ready_for_review, closed]
+    paths: ["**.ts", "**.js", "**/package*.json", "**/workflows/on-merge-main.yml", "**/workflows/active-pr-checks.yml"]
+
+# Allow a subsequently queued workflow run to interrupt a previous run
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  check-code:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Project
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm run ci-cd
+
+      - name: Ensure Project Builds
+        run: npm run build:ci
+
+      - name: Run Tests
+        run: npm run test
+
+      - name: Ensure Build is Fresh
+        id: diff
+        run: diff dist/index.js ci-dist/index.js -s
+
+      - name: Conditionally Alert on Diff
+        if: ${{ failure() && steps.diff.conclusion == 'failure' }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.
+
+  publish-version:
+    if: ${{ github.event.pull_request.merged && github.event.pull_request.base.ref == 'main' }}
+    needs: check-code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Version Code
+        uses: ./
+        id: semver
+
+      - name: check
+        run: |
+          echo ${{ steps.semver.outputs.string }} 
+          echo ${{ steps.semver.outputs.lastMainTag }}
+
+      - name: Create Semver Tag
+        uses: actions/github-script@v5
+        env:
+          TAG: ${{ steps.semver.outputs.string }}
+        with:
+          script: |
+            const { TAG } = process.env
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${TAG}`,
+              sha: context.sha
+            })
+
+      - name: Create Release
+        uses: actions/github-script@v6
+        env:
+          CURR: ${{ steps.semver.outputs.string }}
+          PREV: ${{ steps.semver.outputs.lastMainTag }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        with:
+          script: |
+            const { CURR, PREV, PR_TITLE, PR_BODY } = process.env
+            const baseUrl = 'https://github.com/rapidstack/pr-label-semver-action/compare';
+
+            const body = [
+              `# ${PR_TITLE}`,
+              '',
+              '## Changes:',
+              PR_BODY,
+              '',
+              '---',
+              `Compare: [v${PREV} → v${CURR}](${baseUrl}/v${PREV}...v${CURR})`
+            ].join('\n')
+
+            github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              draft: false,
+              generate_release_notes: false,
+              name: `v${CURR}`,
+              body: body,
+              prerelease: false,
+              tag_name: `v${CURR}`,
+            })
