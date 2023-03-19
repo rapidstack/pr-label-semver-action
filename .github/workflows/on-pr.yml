@@ -64,3 +64,21 @@ jobs:
         run: |
           echo ${{ steps.semver.outputs.string }} 
           echo ${{ steps.semver.outputs.lastMainTag }}
+
+      - name: Test Release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `# v${{ steps.semver.outputs.string }} ${{ github.event.pull_request.title }}
+              
+              ## Changes
+              ${{ github.event.pull_request.body }}
+
+              ---
+              Compare: [v${{ steps.semver.outputs.string }} → v${{ steps.semver.outputs.lastMainTag }}](https://github.com/rapidstack/pr-label-semver-action/compare/v${{ steps.semver.outputs.string }}...v${{ steps.semver.outputs.lastMainTag }})
+              `
+            })
