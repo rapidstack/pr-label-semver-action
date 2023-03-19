@@ -1,7 +1,10 @@
-name: Weekly Dependency Update Branch
+name: Rolling Dependency Update Branch
 on:
-  schedule:
-    - cron: "0 6 * * 6" # (friday at midnight CST)
+  pull_request:
+    types:
+      - 'closed'
+    branches:
+      - 'dependabot-staging'
   workflow_dispatch:
 
 jobs:
@@ -13,21 +16,22 @@ jobs:
           fetch-depth: "0"
       - name: Create Branch
         run: |
-          git config --global user.name "Zack Heil"
-          git config --global user.email "57419337+zackheil@users.noreply.github.com"
+          git config --global user.email "action@github.com"
+          git config --global user.name "Github Actions"
           git checkout -b dependabot-staging
-          git commit --allow-empty -m "Create dependabot-staging branch"
+          git commit --allow-empty -m "chore: Weekly Dependency Updates (Staging)"
           git push origin dependabot-staging
       - name: Create Draft PR for Updates
-        uses: devops-infra/action-pull-request@v0.5.5
+        uses: actions/github-script@v6
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: dependabot-staging
-          target_branch: main
-          title: "Weekly Dependency Updates"
-          body: "Bulk dependency updates for the week."
-          reviewer: "zackheil"
-          assignee: "zackheil"
-          draft: true
-          ignore_users: "dependabot"
-          allow_no_diff: true
+          script: |
+            github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Weekly Dependency Updates",
+              head: "dependabot-staging",
+              base: "main",
+              body: "Weekly Dependency Updates for NPM and GitHub Actions",
+              draft: true,
+              maintainer_can_modify: true
+            })

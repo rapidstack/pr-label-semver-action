@@ -5,10 +5,7 @@ updates:
     target-branch: "dependabot-staging"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "15:00"
-      timezone: "America/Chicago"
+      interval: "daily"
     open-pull-requests-limit: 100
     commit-message:
       prefix: "(Action Update):"
@@ -21,10 +18,7 @@ updates:
     target-branch: "dependabot-staging"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "15:00"
-      timezone: "America/Chicago"
+      interval: "daily"
     open-pull-requests-limit: 100
     commit-message:
       prefix: "(Dep Update):"
