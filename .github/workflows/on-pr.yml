@@ -51,9 +51,15 @@ jobs:
     needs: check-code
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
       - name: Version Code
         uses: ./
         id: semver
+
       - name: check
         run: |
           echo ${{ steps.semver.outputs.string }} 
