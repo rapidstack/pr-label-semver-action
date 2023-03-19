@@ -101,11 +101,12 @@ The action will output the following variables that can be used in subsequent st
       tag: ${{ steps.semver.outputs.string }}
 ```
 
-| Name         | Description                                                                              |
-| ------------ | ---------------------------------------------------------------------------------------- |
-| `string`     | The semantic version string. Looks like: `1.2.3` or `1.2.3-rc.{commit-sha}`              |
-| `major`      | The major version number.                                                                |
-| `minor`      | The minor version number.                                                                |
-| `patch`      | The patch version number.                                                                |
-| `suffix`     | A portion after the semver for prereleases. By default it looks like: `rc.{commit-sha}`. |
-| `prerelease` | A boolean to denote if the semver is a prerelease.                                       |
+| Name          | Description                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| `string`      | The semantic version string. Looks like: `1.2.3` or `1.2.3-rc.{commit-sha}`              |
+| `major`       | The major version number.                                                                |
+| `minor`       | The minor version number.                                                                |
+| `patch`       | The patch version number.                                                                |
+| `suffix`      | A portion after the semver for prereleases. By default it looks like: `rc.{commit-sha}`. |
+| `prerelease`  | A boolean to denote if the semver is a prerelease.                                       |
+| `lastMainTag` | The last tag on the main branch.                                                         |
