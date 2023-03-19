@@ -67,18 +67,29 @@ jobs:
 
       - name: Test Release
         uses: actions/github-script@v6
+        env:
+          CURR: ${{ steps.semver.outputs.string }}
+          PREV: ${{ steps.semver.outputs.lastMainTag }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         with:
           script: |
+            const { CURR, PREV, PR_TITLE, PR_BODY } = process.env
+            const baseUrl = 'https://github.com/rapidstack/pr-label-semver-action/compare/';
+
+            const body = [
+              `# v${CURR} ${PR_TITLE}`,
+              '',
+              '## Changes',
+              PR_BODY,
+              '',
+              '---',
+              `Compare: [v${PREV} → v${CURR}](${baseUrl}v${PREV}...v${CURR})`
+            ].join('\n')
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `# v${{ steps.semver.outputs.string }} ${{ github.event.pull_request.title }}
-              
-              ## Changes
-              ${{ github.event.pull_request.body }}
-
-              ---
-              Compare: [v${{ steps.semver.outputs.string }} → v${{ steps.semver.outputs.lastMainTag }}](https://github.com/rapidstack/pr-label-semver-action/compare/v${{ steps.semver.outputs.string }}...v${{ steps.semver.outputs.lastMainTag }})
-              `
+              body: body
             })
