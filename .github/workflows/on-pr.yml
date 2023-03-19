@@ -47,7 +47,7 @@ jobs:
             Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.
 
   publish-version:
-    if: ${{ github.event.pull_request.merged }}
+    if: ${{ github.event.pull_request.merged && github.event.pull_request.base.ref == 'main' }}
     needs: check-code
     runs-on: ubuntu-latest
     steps:
