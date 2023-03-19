@@ -47,7 +47,7 @@ jobs:
             Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.
 
   publish-version:
-    # if: ${{ github.event.pull_request.merged }}
+    if: ${{ github.event.pull_request.merged }}
     needs: check-code
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +65,21 @@ jobs:
           echo ${{ steps.semver.outputs.string }} 
           echo ${{ steps.semver.outputs.lastMainTag }}
 
-      - name: Test Release
+      - name: Create Semver Tag
+        uses: actions/github-script@v5
+        env:
+          TAG: ${{ steps.semver.outputs.string }}
+        with:
+          script: |
+            const { TAG } = process.env
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${TAG}`,
+              sha: context.sha
+            })
+
+      - name: Create Release
         uses: actions/github-script@v6
         env:
           CURR: ${{ steps.semver.outputs.string }}
@@ -75,21 +89,25 @@ jobs:
         with:
           script: |
             const { CURR, PREV, PR_TITLE, PR_BODY } = process.env
-            const baseUrl = 'https://github.com/rapidstack/pr-label-semver-action/compare/';
+            const baseUrl = 'https://github.com/rapidstack/pr-label-semver-action/compare';
 
             const body = [
-              `# v${CURR} ${PR_TITLE}`,
+              `# ${PR_TITLE}`,
               '',
-              '## Changes',
+              '## Changes:',
               PR_BODY,
               '',
               '---',
-              `Compare: [v${PREV} → v${CURR}](${baseUrl}v${PREV}...v${CURR})`
+              `Compare: [v${PREV} → v${CURR}](${baseUrl}/v${PREV}...v${CURR})`
             ].join('\n')
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: body
+              draft: false,
+              generate_release_notes: false,
+              name: `v${CURR}`,
+              body: body,
+              prerelease: false,
+              tag_name: `v${CURR}`,
             })
