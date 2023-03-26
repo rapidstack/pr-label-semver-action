@@ -55,6 +55,49 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
 };
 
 /**
+ * Determines the default branch of the repo, looks for commits on that branch,
+ * and gets the latest tag on that branch.
+ */
+export const getLatestPRTag = async (ext: External) => {
+  const octokit = ext.getOctokit(ext.getToken());
+  const context = ext.getContext();
+
+  if (!context.payload.pull_request) {
+    ext.logDebug('No pull request found, skipping PR commit tag search.');
+    return;
+  }
+
+  ext.logDebug('Searching last 100 commits from the latest PR tag.');
+
+  const commits = await octokit.rest.pulls.listCommits({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    per_page: 100,
+    pull_number: context.payload.pull_request.number,
+  });
+  const commitHashes = commits.data.map(({ sha }) => sha);
+  ext.logDebug('Last 100 commit hashes on the default branch: ' + JSON.stringify(commitHashes, null, 2));
+
+  const tags = await octokit.rest.repos.listTags({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    per_page: 100,
+  });
+  const tagMap = tags.data.reduce((acc, { name, commit }) => {
+    acc[commit.sha] = name;
+    return acc;
+  }, {} as Record<string, string>);
+  ext.logDebug('Last 100 tags and their related commit hashes: ' + JSON.stringify(tagMap, null, 2));
+
+  const latestTag = commitHashes.find((hash) => tagMap[hash]);
+
+  if (latestTag) ext.logDebug('Determined latest tag on the default branch is: ' + tagMap[latestTag]);
+  else ext.logDebug('No tags found on the default branch in the last 100 commits.');
+
+  return latestTag ? tagMap[latestTag] : undefined;
+};
+
+/**
  * Gets the labels from the PR, looks for those appropriate for the action, and returns the appropriate semver bump.
  * If no label is found, returns an action following the default bump.
  */

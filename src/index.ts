@@ -17,6 +17,9 @@ export const main = async (ext: External, mockInput?: MockInput) => {
     const latestTag = await getLatestDefaultBranchTag(ext);
     if (!latestTag) throw new Error("No tags found on the repo's default branch in the last 100 commits!");
 
+    // Get the most recent prerelease tag associated with the commit in the PR that triggered the action
+    // TODO
+
     // Resolve the version number based on the labels and the most recent tag
     const { action, prerelease } = getActionFromPRLabels(ext, labelPrefix, defaultBump);
     const shortSha = context.payload.pull_request?.head.sha.slice(0, 7);
