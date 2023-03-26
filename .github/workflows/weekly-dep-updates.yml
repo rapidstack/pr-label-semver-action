@@ -2,9 +2,9 @@ name: Rolling Dependency Update Branch
 on:
   pull_request:
     types:
-      - 'closed'
+      - "closed"
     branches:
-      - 'dependabot-staging'
+      - "dependabot-staging"
   workflow_dispatch:
 
 jobs:
