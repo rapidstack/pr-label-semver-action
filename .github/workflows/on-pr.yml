@@ -60,11 +60,6 @@ jobs:
         uses: ./
         id: semver
 
-      - name: check
-        run: |
-          echo ${{ steps.semver.outputs.string }} 
-          echo ${{ steps.semver.outputs.lastMainTag }}
-
       - name: Create Semver Tag
         uses: actions/github-script@v6
         env:
