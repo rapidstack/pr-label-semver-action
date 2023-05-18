@@ -52,6 +52,7 @@ const GoodInput2: MockInput = {
   prereleasePrefix: 'beta.',
   labelPrefix: 'release:',
 };
+
 const GoodInput3: MockInput = {
   context: {
     repo: {

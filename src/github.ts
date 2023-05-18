@@ -18,7 +18,7 @@ export const getActionInput = (ext: External, name: string, def: string) => {
  * and gets the latest tag on that branch.
  */
 export const getLatestDefaultBranchTag = async (ext: External) => {
-  ext.logDebug('Searching last 100 commits from the default branch for a tag.');
+  ext.logDebug('Searching commits from the default branch for a tag.');
 
   const octokit = ext.getOctokit(ext.getToken());
   const context = ext.getContext();
@@ -26,32 +26,55 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
   const defaultBranchName = context.payload.repository?.default_branch as string;
   ext.logDebug('Default branch for repo: ' + defaultBranchName);
 
-  const commits = await octokit.rest.repos.listCommits({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    sha: defaultBranchName,
-    per_page: 100,
-  });
-  const commitHashes = commits.data.map(({ sha }) => sha);
-  ext.logDebug('Last 100 commit hashes on the default branch: ' + JSON.stringify(commitHashes, null, 2));
+  let page = 1;
+  let latestTag: string | undefined;
 
+  ext.logDebug('Fetching tags...');
   const tags = await octokit.rest.repos.listTags({
     owner: context.repo.owner,
     repo: context.repo.repo,
     per_page: 100,
   });
+
   const tagMap = tags.data.reduce((acc, { name, commit }) => {
     acc[commit.sha] = name;
     return acc;
   }, {} as Record<string, string>);
-  ext.logDebug('Last 100 tags and their related commit hashes: ' + JSON.stringify(tagMap, null, 2));
 
-  const latestTag = commitHashes.find((hash) => tagMap[hash]);
+  while (!latestTag) {
+    ext.logDebug(`Searching commits (page ${page})...`);
 
-  if (latestTag) ext.logDebug('Determined latest tag on the default branch is: ' + tagMap[latestTag]);
-  else ext.logDebug('No tags found on the default branch in the last 100 commits.');
+    const commits = await octokit.rest.repos.listCommits({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      sha: defaultBranchName,
+      per_page: 100,
+      page,
+    });
 
-  return latestTag ? tagMap[latestTag] : undefined;
+    const commitHashes = commits.data.map(({ sha }) => sha);
+    ext.logDebug('Commit hashes on the default branch: ' + JSON.stringify(commitHashes, null, 2));
+
+    ext.logDebug('Tags and their related commit hashes: ' + JSON.stringify(tagMap, null, 2));
+
+    latestTag = commitHashes.find((hash) => tagMap[hash]);
+
+    if (!latestTag) {
+      if (commits.data.length < 100) {
+        ext.logDebug('No tags found on the default branch in the commits searched.');
+        break;
+      }
+      page++;
+    }
+  }
+
+  if (latestTag) {
+    ext.logDebug('Determined latest tag on the default branch is: ' + tagMap[latestTag]);
+    return tagMap[latestTag];
+  } else {
+    ext.logDebug('No tags found on the default branch in the commits searched.');
+    return undefined;
+  }
 };
 
 /**
