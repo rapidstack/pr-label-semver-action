@@ -59,6 +59,8 @@ jobs:
       - name: Version Code
         uses: ./
         id: semver
+        with:
+          label-prefix: "sv:"
 
       - name: Create Semver Tag
         uses: actions/github-script@v6
