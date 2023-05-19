@@ -52,6 +52,7 @@ const GoodInput2: MockInput = {
   prereleasePrefix: 'beta.',
   labelPrefix: 'release:',
 };
+
 const GoodInput3: MockInput = {
   context: {
     repo: {
@@ -130,6 +131,7 @@ describe('Action Main', () => {
     expect(mockExt.setOutput).toHaveBeenCalledWith('string', '0.6.0-beta.deadbee');
     expect(mockExt.setOutput).toHaveBeenCalledWith('lastMainTag', '0.5.9');
   });
+
   test('Success case. Merged with prerelease', async () => {
     mockExt = makeMockExternal(GoodInput3.context);
     await expect(main(mockExt, GoodInput3)).resolves.toBeUndefined();

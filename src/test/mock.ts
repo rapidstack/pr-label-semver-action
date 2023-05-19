@@ -1,7 +1,11 @@
 import { vi, MockedObject } from 'vitest';
 import { External, MockInput } from '../types.js';
 
-const commitResponse = [
+const commitResponseNoMatch100 = Array.from({ length: 100 })
+  .map(() => '1111111111111111111111111111111111111111')
+  .map((sha) => ({ sha }));
+
+const commitResponseWithMatch = [
   '5a4c2b2bd7dae696b7040d07e0e5b25d8b819c46',
   'cc306a9b90e4a63376ecfd112ac27c60e0ac299e',
   'c813ca80bc28bb36d4b70402e3158c9eec5dbc18',
@@ -48,7 +52,10 @@ export const makeMockExternal = (ctx: MockInput['context']) =>
     getOctokit: () => ({
       rest: {
         repos: {
-          listCommits: vi.fn().mockReturnValueOnce({ data: commitResponse }),
+          listCommits: vi
+            .fn()
+            .mockReturnValueOnce({ data: commitResponseNoMatch100 })
+            .mockReturnValueOnce({ data: commitResponseWithMatch }),
           listTags: vi.fn().mockReturnValueOnce({ data: tagResponse }),
         },
       },
