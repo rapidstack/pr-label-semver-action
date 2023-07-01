@@ -10,9 +10,7 @@ updates:
     commit-message:
       prefix: "(Action Update):"
     reviewers:
-      - "zackheil"
-    assignees:
-      - "zackheil"
+      - "@rapidstack/public-code-reviewers"
 
   - package-ecosystem: "npm"
     target-branch: "dependabot-staging"
@@ -24,6 +22,4 @@ updates:
       prefix: "(Dep Update):"
       prefix-development: "(Dev Dep Update):"
     reviewers:
-      - "zackheil"
-    assignees:
-      - "zackheil"
+      - "@rapidstack/public-code-reviewers"
