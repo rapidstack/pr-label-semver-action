@@ -2,14 +2,13 @@ name: Rolling Dependency Update Branch
 on:
   pull_request:
     types:
-      - "closed"
+      - closed
     branches:
-      - "dependabot-staging"
-  workflow_dispatch:
+      - main
 
 jobs:
   create-branch:
-    if: (github.event.pull_request.merged && github.head_ref == 'dependabot-staging' && github.base_ref == 'main') || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'dependabot-staging' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
