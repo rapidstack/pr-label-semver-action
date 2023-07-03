@@ -45,7 +45,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "typescript": "^5.1.6",
-    "vitest": "^0.32.2"
+    "vitest": "^0.32.4"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
