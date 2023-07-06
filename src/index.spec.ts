@@ -151,7 +151,7 @@ describe('Action Main', () => {
     expect(mockExt.setFailed).toHaveBeenCalledWith(
       'Multiple applicable labels found on the active pull request. ' +
         'Please only use one of the following labels: release:major, ' +
-        'release:minor, release:patch'
+        'release:minor, release:patch',
     );
   });
 });
