@@ -36,10 +36,13 @@ export const getLatestDefaultBranchTag = async (ext: External) => {
     per_page: 100,
   });
 
-  const tagMap = tags.data.reduce((acc, { name, commit }) => {
-    acc[commit.sha] = name;
-    return acc;
-  }, {} as Record<string, string>);
+  const tagMap = tags.data.reduce(
+    (acc, { name, commit }) => {
+      acc[commit.sha] = name;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 
   while (!latestTag) {
     ext.logDebug(`Searching commits (page ${page})...`);
@@ -110,14 +113,14 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
 
   if (remainingLabels?.length > 1) {
     throw new Error(
-      `Multiple applicable labels found on the active pull request. Please only use one of the following labels: ${prefix}major, ${prefix}minor, ${prefix}patch`
+      `Multiple applicable labels found on the active pull request. Please only use one of the following labels: ${prefix}major, ${prefix}minor, ${prefix}patch`,
     );
   }
 
   if (remainingLabels?.length === 0) {
     ext.logDebug(
       'No applicable labels found on the active pull request or not operating in a pull request. Using default bump: ' +
-        def
+        def,
     );
     return {
       action: def,

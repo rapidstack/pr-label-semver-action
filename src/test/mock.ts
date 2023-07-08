@@ -62,4 +62,4 @@ export const makeMockExternal = (ctx: MockInput['context']) =>
     }),
     getContext: vi.fn().mockReturnValue(ctx),
     setOutput: vi.fn(),
-  } as unknown as MockedObject<External>);
+  }) as unknown as MockedObject<External>;
