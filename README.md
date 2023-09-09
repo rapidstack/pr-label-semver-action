@@ -4,7 +4,7 @@ This action assists in generating a semantic version change for a codebase based
 
 ## Getting Started
 
-First, determine the label naming scheme you want to use to trigger a version change (the names are case insensitive). By default, the action will look for the following labels: `major`, `minor`, `patch`, and `generate_prerelease`. If these conflict with your existing labels, you can specify a prefix to instead use labels like: `semver:major`, `semver:minor`, `semver:patch`, and `semver:generate_prerelease`.
+First, determine the label naming scheme you want to use to trigger a version change (the names are case insensitive). By default, the action will look for the following labels: `major`, `minor`, `patch`, and the label pattern `*prerelease*`. If these conflict with your existing labels, you can specify a prefix to instead use labels like: `semver:major`, `semver:minor`, `semver:patch`, and `semver:*prerelease*`.
 
 Now you can add the action to your workflow. The following example workflow will run on pull request events and will use the default label names:
 

@@ -40,7 +40,7 @@ const GoodInput2: MockInput = {
         head: {
           sha: 'deadbeef1234567890cafebabe123',
         },
-        labels: [{ name: 'release:minor' }, { name: 'release:generate_prerelease' }],
+        labels: [{ name: 'release:minor' }, { name: 'release:prefix_prerelease' }],
         merged: false,
       },
       repository: {
@@ -64,8 +64,32 @@ const GoodInput3: MockInput = {
         head: {
           sha: 'deadbeef1234567890cafebabe123',
         },
-        labels: [{ name: 'release:minor' }, { name: 'release:generate_prerelease' }],
+        labels: [{ name: 'release:minor' }, { name: 'release:prerelease' }],
         merged: true,
+      },
+      repository: {
+        default_branch: 'main',
+      },
+    },
+  } as unknown as MockInput['context'],
+  defaultBump: 'minor',
+  prereleasePrefix: 'beta.',
+  labelPrefix: 'release:',
+};
+
+const GoodInput4: MockInput = {
+  context: {
+    repo: {
+      owner: 'test',
+      repo: 'test',
+    },
+    payload: {
+      pull_request: {
+        head: {
+          sha: 'deadbeef1234567890cafebabe123',
+        },
+        labels: [{ name: 'release:minor' }, { name: 'release:prerelease_suffix' }],
+        merged: false,
       },
       repository: {
         default_branch: 'main',
@@ -119,9 +143,22 @@ describe('Action Main', () => {
     expect(mockExt.setOutput).toHaveBeenCalledWith('lastMainTag', '0.5.9');
   });
 
-  test('Success case. With prerelease', async () => {
+  test('Success case. With prerelease prefix', async () => {
     mockExt = makeMockExternal(GoodInput2.context);
     await expect(main(mockExt, GoodInput2)).resolves.toBeUndefined();
+    expect(mockExt.setFailed).not.toHaveBeenCalled();
+    expect(mockExt.setOutput).toHaveBeenCalledWith('major', 0);
+    expect(mockExt.setOutput).toHaveBeenCalledWith('minor', 6);
+    expect(mockExt.setOutput).toHaveBeenCalledWith('patch', 0);
+    expect(mockExt.setOutput).toHaveBeenCalledWith('prerelease', true);
+    expect(mockExt.setOutput).toHaveBeenCalledWith('suffix', 'beta.deadbee');
+    expect(mockExt.setOutput).toHaveBeenCalledWith('string', '0.6.0-beta.deadbee');
+    expect(mockExt.setOutput).toHaveBeenCalledWith('lastMainTag', '0.5.9');
+  });
+
+  test('Success case. With prerelease suffix', async () => {
+    mockExt = makeMockExternal(GoodInput4.context);
+    await expect(main(mockExt, GoodInput4)).resolves.toBeUndefined();
     expect(mockExt.setFailed).not.toHaveBeenCalled();
     expect(mockExt.setOutput).toHaveBeenCalledWith('major', 0);
     expect(mockExt.setOutput).toHaveBeenCalledWith('minor', 6);
