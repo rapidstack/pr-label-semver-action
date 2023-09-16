@@ -89,8 +89,7 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
 
   const context = ext.getContext();
   const merged = context.payload.pull_request?.merged || false;
-  const labels = context.payload.pull_request?.labels.map(({ name }: { name: string }) => name.toLowerCase());
-
+  const labels: string[] = context.payload.pull_request?.labels.map(({ name }: { name: string }) => name.toLowerCase());
   ext.logDebug('Labels on the active pull request: ' + JSON.stringify(labels, null, 2));
   if (merged) ext.logDebug('Pull request is merged, will not generate a prerelease version.');
 
@@ -99,7 +98,7 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
       label === `${prefix}major` ||
       label === `${prefix}minor` ||
       label === `${prefix}patch` ||
-      label === `${prefix}generate_prerelease`
+      isPrereleaseLabel(label, prefix)
     ) {
       return true;
     }
@@ -107,9 +106,9 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
   });
   ext.logDebug('Applicable labels on the active pull request: ' + JSON.stringify(applicableLabels, null, 2));
 
-  // Extract the 'generate_prerelease' label if it exists
-  const generatePrerelease = merged ? false : applicableLabels?.includes(`${prefix}generate_prerelease`);
-  const remainingLabels = applicableLabels?.filter((label: string) => label !== `${prefix}generate_prerelease`);
+  // Extract the prerelease label if it exists
+  const generatePrerelease = merged ? false : applicableLabels?.some((label) => isPrereleaseLabel(label, prefix));
+  const remainingLabels = applicableLabels?.filter((label: string) => !isPrereleaseLabel(label, prefix));
 
   if (remainingLabels?.length > 1) {
     throw new Error(
@@ -132,4 +131,14 @@ export const getActionFromPRLabels = (ext: External, prefix: string, def: 'major
     action: remainingLabels?.[0].replace(`${prefix}`, '') as Semver,
     prerelease: generatePrerelease ? true : false,
   };
+};
+
+/**
+ * Checks to see if the label matches the prerelease label pattern.
+ * @param label The label to check.
+ * @param prefix The prefix to check for.
+ * @returns True if the label matches the pattern, false otherwise.
+ */
+export const isPrereleaseLabel = (label: string, prefix: string) => {
+  return label.startsWith(prefix) && label.includes('prerelease');
 };
