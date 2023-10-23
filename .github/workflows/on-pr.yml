@@ -46,19 +46,8 @@ jobs:
           message: |
             Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.
 
-  debug:
-    needs: check-code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug PR Information
-        run: |
-          echo "Merged check: ${{ github.event.pull_request.merged }}"
-          echo "Base ref: ${{ github.event.pull_request.base.ref }}"
-          echo "Labels check: ${{ startsWith(github.event.pull_request.labels.*.name, 'sv') }}"
-          echo "Labels check: ${{ toJson(github.event.pull_request.labels.*.name) }}"
-
   publish-version:
-    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && startsWith(github.event.pull_request.labels.*.name, 'sv:') }}
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'sv:') }}
     needs: check-code
     runs-on: ubuntu-latest
     permissions:
