@@ -56,7 +56,6 @@ jobs:
           echo "Base ref: ${{ github.event.pull_request.base.ref }}"
           echo "Labels: ${{ github.event.pull_request.labels.*.name }}"
 
-
   publish-version:
     if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && startsWith(github.event.pull_request.labels.*.name, 'sv:') }}
     needs: check-code
