@@ -47,7 +47,14 @@ jobs:
             Diff detected between workflow build and the current contents of `dist`. Commit a fresh build of the `dist` directory to resolve this issue.
 
   publish-version:
-    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'sv:') }}
+    if: |
+      github.event.pull_request.merged && 
+      github.event.pull_request.base.ref == 'main' && 
+      (
+        contains(github.event.pull_request.labels.*.name, 'sv:patch') }} ||
+        contains(github.event.pull_request.labels.*.name, 'sv:minor') }} ||
+        contains(github.event.pull_request.labels.*.name, 'sv:major') }} 
+      )
     needs: check-code
     runs-on: ubuntu-latest
     permissions:
