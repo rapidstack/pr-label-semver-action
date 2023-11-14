@@ -72,7 +72,7 @@ jobs:
           label-prefix: "sv:"
 
       - name: Create Semver Tag
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           TAG: ${{ steps.semver.outputs.string }}
         with:
@@ -86,7 +86,7 @@ jobs:
             })
 
       - name: Create Release
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           CURR: ${{ steps.semver.outputs.string }}
           PREV: ${{ steps.semver.outputs.lastMainTag }}
